@@ -16,8 +16,6 @@ public class AuthorDAOImpl implements AuthorDAO {
     @Override
     public Optional<Author> findById(int id) {
         String sql = "SELECT * FROM lib.authors WHERE id = ?";
-        Author author = null;
-
         try (Connection connection = DBConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
@@ -25,73 +23,137 @@ public class AuthorDAOImpl implements AuthorDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                author = new Author();
+                Author author = new Author();
                 author.setId(resultSet.getInt("id"));
                 author.setName(resultSet.getString("name"));
+                return Optional.of(author);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return Optional.empty();
         }
-
-        return Optional.of(author);
+        return Optional.empty();
     }
 
     @Override
     public List<Author> findAll() {
         List<Author> authors = new ArrayList<>();
         String sql = "SELECT * FROM lib.authors";
-
         try (Connection connection = DBConnection.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
                 authors.add(new Author(resultSet.getInt("id"), resultSet.getString("name")));
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
-        
         return authors;
     }
 
     @Override
     public void save(Author author) {
-        String sql = "INSERT INTO library_auth.authors (name) VALUES (?)";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
-            preparedStatement.setString(1, author.getName());
-            preparedStatement.executeUpdate();
+        String sql = "INSERT INTO lib.authors (name) VALUES (?)";
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                preparedStatement.setString(1, author.getName());
+                preparedStatement.executeUpdate();
+                connection.commit();
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Failed to save author", e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     @Override
     public void update(Author author) {
         String sql = "UPDATE lib.authors SET name = ? WHERE id = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            connection.setAutoCommit(false);
 
-            preparedStatement.setString(1, author.getName());
-            preparedStatement.setInt(2, author.getId());
-            preparedStatement.executeUpdate();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, author.getName());
+                preparedStatement.setInt(2, author.getId());
+                preparedStatement.executeUpdate();
+            }
+
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Failed to update author", e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     @Override
     public void delete(int id) {
-        String sql = "DELETE FROM library_auth.authors WHERE id = ?";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        String sql = "DELETE FROM lib.authors WHERE id = ?";
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            connection.setAutoCommit(false);
 
-            preparedStatement.setInt(1, id);
-            preparedStatement.executeUpdate();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setInt(1, id);
+                preparedStatement.executeUpdate();
+            }
+
+            connection.commit();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Failed to delete author", e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

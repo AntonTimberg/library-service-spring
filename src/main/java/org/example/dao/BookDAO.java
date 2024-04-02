@@ -9,7 +9,7 @@ public interface BookDAO {
     Optional<Book> findById(int id);
     List<Book> findAll();
     List<Book> findByAuthorId(int authorId);
-    void save(Book book);
+    Book save(Book book);
     void update(Book book);
     void delete(int id);
 }

@@ -17,24 +17,23 @@ public class GenreDAOImpl implements GenreDAO{
     @Override
     public Optional<Genre> findById(int id) {
         String sql = "SELECT * FROM lib.genres WHERE id = ?";
-        Genre genre = null;
-
         try(Connection connection = DBConnection.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql)){
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                genre = new Genre();
+                Genre genre = new Genre();
                 genre.setId(resultSet.getInt("id"));
                 genre.setName(resultSet.getString("name"));
+                return Optional.ofNullable(genre);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            throw new RuntimeException("Error fetching genre by id: " + id, e);
         }
-
-        return Optional.of(genre);
+        return Optional.empty();
     }
 
     @Override
@@ -61,42 +60,103 @@ public class GenreDAOImpl implements GenreDAO{
     @Override
     public void save(Genre genre) {
         String sql = "INSERT INTO lib.genres (name) VALUES (?)";
-        try (Connection connection = DBConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            connection.setAutoCommit(false);
 
-            preparedStatement.setString(1, genre.getName());
-            preparedStatement.executeUpdate();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, genre.getName());
+                preparedStatement.executeUpdate();
+                connection.commit();
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Failed to save genre", e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     @Override
     public void update(Genre genre) {
         String sql = "UPDATE lib.genres SET name = ? WHERE id = ?";
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            connection.setAutoCommit(false);
 
-        try (Connection connection = DBConnection.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
-            preparedStatement.setString(1, genre.getName());
-            preparedStatement.setInt(2, genre.getId());
-            preparedStatement.executeUpdate();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setString(1, genre.getName());
+                preparedStatement.setInt(2, genre.getId());
+                preparedStatement.executeUpdate();
+                connection.commit();
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Failed to update genre", e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     @Override
     public void delete(int id) {
         String sql = "DELETE FROM lib.genres WHERE id = ?";
+        Connection connection = null;
+        try {
+            connection = DBConnection.getConnection();
+            connection.setAutoCommit(false);
 
-        try (Connection connection = DBConnection.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
-            preparedStatement.setInt(1, id);
-            preparedStatement.executeUpdate();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setInt(1, id);
+                preparedStatement.executeUpdate();
+                connection.commit();
+            }
         } catch (SQLException e) {
-            throw new RuntimeException();
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw new RuntimeException("Failed to delete genre", e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

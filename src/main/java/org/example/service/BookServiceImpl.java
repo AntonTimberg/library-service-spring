@@ -41,5 +41,9 @@ public class BookServiceImpl implements BookService{
         if (book.getTitle() == null || book.getTitle().trim().isEmpty()) {
             throw new IllegalArgumentException("Название книги не может быть пустым");
         }
+
+        if (book.getGenres() == null || book.getGenres().isEmpty()) {
+            throw new IllegalArgumentException("Книга должна быть связана c хотя бы одним жанром.");
+        }
     }
 }
