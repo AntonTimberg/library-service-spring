@@ -1,6 +1,8 @@
-package org.example.servlet.dto;
+package org.example.servlet.dto.converter;
 
 import org.example.model.Author;
+import org.example.servlet.dto.AuthorDTO;
+
 import java.util.stream.Collectors;
 
 public class AuthorToAuthorDtoConverter implements Converter<Author, AuthorDTO> {

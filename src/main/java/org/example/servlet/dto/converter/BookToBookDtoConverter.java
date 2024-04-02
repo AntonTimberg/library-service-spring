@@ -1,8 +1,9 @@
-package org.example.servlet.dto;
+package org.example.servlet.dto.converter;
 
 import org.example.model.Book;
 import java.util.stream.Collectors;
 import org.example.model.Genre;
+import org.example.servlet.dto.BookDTO;
 
 
 public class BookToBookDtoConverter implements Converter<Book, BookDTO> {

@@ -1,6 +1,7 @@
-package org.example.servlet.dto;
+package org.example.servlet.dto.converter;
 
 import org.example.model.Genre;
+import org.example.servlet.dto.GenreDTO;
 
 public class GenreToGenreDtoConverter implements Converter<Genre, GenreDTO> {
     @Override

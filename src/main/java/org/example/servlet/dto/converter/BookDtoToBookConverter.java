@@ -1,6 +1,7 @@
-package org.example.servlet.dto;
+package org.example.servlet.dto.converter;
 
 import org.example.model.Book;
+import org.example.servlet.dto.BookDTO;
 
 public class BookDtoToBookConverter implements Converter<BookDTO, Book> {
     @Override
