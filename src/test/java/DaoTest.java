@@ -1,6 +1,12 @@
 import org.example.dao.AuthorDAO;
 import org.example.dao.AuthorDAOImpl;
+import org.example.dao.BookDAO;
+import org.example.dao.BookDAOImpl;
+import org.example.dao.GenreDAO;
+import org.example.dao.GenreDAOImpl;
 import org.example.model.Author;
+import org.example.model.Book;
+import org.example.model.Genre;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,13 +18,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 @Testcontainers
-public class AuthorDaoTest {
-
+public class DaoTest {
     @Container
     public static PostgreSQLContainer postgresqlContainer = new PostgreSQLContainer("postgres:latest")
             .withDatabaseName("testdb")
@@ -74,11 +83,11 @@ public class AuthorDaoTest {
         );
 
         statement.execute(
-                "CREATE TABLE IF NOT EXISTS lib.books (" +
-                        "id SERIAL PRIMARY KEY," +
-                        "title VARCHAR(255) NOT NULL," +
-                        "author_id INTEGER NOT NULL," +
-                        "FOREIGN KEY (author_id) REFERENCES lib.authors(id)" +
+                "CREATE TABLE IF NOT EXISTS lib.books (\n" +
+                        "    id SERIAL PRIMARY KEY,\n" +
+                        "    title VARCHAR(255) NOT NULL,\n" +
+                        "    author_id INTEGER NOT NULL,\n" +
+                        "    FOREIGN KEY (author_id) REFERENCES lib.authors(id) ON DELETE CASCADE\n" +
                         ");"
         );
 
@@ -114,7 +123,7 @@ public class AuthorDaoTest {
     }
 
     @Test
-    void addingAndFindAuthor() {
+    void authorAddingAndFind() {
         AuthorDAO authorDAO = new AuthorDAOImpl();
 
         authorDAO.save(new Author("Первый"));
@@ -123,7 +132,7 @@ public class AuthorDaoTest {
     }
 
     @Test
-    void addingAndUpdateAuthor() {
+    void authroAddingAndUpdate() {
         AuthorDAO authorDAO = new AuthorDAOImpl();
 
         authorDAO.save(new Author("Первый"));
@@ -134,5 +143,103 @@ public class AuthorDaoTest {
         assertEquals("Последний", authorDAO.findById(1).get().getName());
     }
 
+    @Test
+    void addingSevenGenresAndDeleteTwo() {
+        GenreDAO genreDAO = new GenreDAOImpl();
 
+        genreDAO.save(new Genre("Первый"));
+        genreDAO.save(new Genre("Второй"));
+        genreDAO.save(new Genre("Третий"));
+        genreDAO.save(new Genre("Четвертый"));
+        genreDAO.save(new Genre("Пятый"));
+        genreDAO.save(new Genre("Шестой"));
+        genreDAO.save(new Genre("Седьмой"));
+
+        List<Genre> authors = genreDAO.findAll();
+
+        genreDAO.delete(authors.get(4).getId());
+        genreDAO.delete(authors.get(5).getId());
+
+        assertEquals(5, genreDAO.findAll().size());
+    }
+
+    @Test
+    void genreSaveAndFindById() {
+        GenreDAO genreDAO = new GenreDAOImpl();
+        Genre genre = new Genre();
+        genre.setName("Криминал");
+        genreDAO.save(genre);
+
+        List<Genre> allGenres = genreDAO.findAll();
+
+        Genre savedGenre = allGenres.get(0);
+        Optional<Genre> foundGenre = genreDAO.findById(savedGenre.getId());
+        assertEquals("Криминал", foundGenre.get().getName());
+    }
+
+    @Test
+    void genreUpdateTest() {
+        GenreDAO genreDAO = new GenreDAOImpl();
+        Genre genre = new Genre();
+        genre.setName("Sci-Fi");
+        genreDAO.save(genre);
+
+        Genre savedGenre = genreDAO.findAll().get(0);
+        savedGenre.setName("Не сай фай");
+        genreDAO.update(savedGenre);
+
+        Optional<Genre> updatedGenre = genreDAO.findById(savedGenre.getId());
+        assertEquals("Не сай фай", updatedGenre.get().getName());
+    }
+
+    @Test
+    void addBookAndTestRelationWithAuthor() {
+        AuthorDAO authorDAO = new AuthorDAOImpl();
+        BookDAO bookDAO = new BookDAOImpl();
+        GenreDAO genreDAO = new GenreDAOImpl();
+
+        authorDAO.save(new Author("Первый"));
+        genreDAO.save(new Genre("Научная литература"));
+
+        List<Author> authors = authorDAO.findAll();
+        List<Genre> genres = genreDAO.findAll();
+
+        if (!authors.isEmpty() && !genres.isEmpty()) {
+            Book book = new Book();
+            book.setAuthorId(authors.get(0).getId());
+            book.setTitle("Книга #1");
+            book.setGenres(genres);
+
+            bookDAO.save(book);
+
+            Author author = authorDAO.findAll().get(0);
+            assertEquals(author.getBooks().get(0).getId(), bookDAO.findAll().get(0).getId());
+        } else {
+            fail("Должен быть хотя бы один автор и жанр");
+        }
+    }
+
+    @Test
+    void addBookThenDeleteAuthorAndCheckBookExistence() {
+        AuthorDAO authorDAO = new AuthorDAOImpl();
+        BookDAO bookDAO = new BookDAOImpl();
+        GenreDAO genreDAO = new GenreDAOImpl();
+
+        authorDAO.save(new Author("Автор"));
+        genreDAO.save(new Genre("Жанр"));
+
+        Book book = new Book();
+        book.setTitle("Книга");
+        Author author = authorDAO.findById(1).get();
+        book.setAuthorId(author.getId());
+        List<Genre> genres = new ArrayList<>();
+        genres.add(genreDAO.findById(1).get());
+        book.setGenres(genres);
+        Book savedBook = bookDAO.save(book);
+
+        authorDAO.delete(author.getId());
+
+        Book foundBook = bookDAO.findById(savedBook.getId()).orElse(null);
+        assertNull("Книга должна быть удалена вместе с автором", foundBook);
+    }
 }
