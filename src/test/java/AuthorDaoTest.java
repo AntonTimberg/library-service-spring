@@ -94,7 +94,7 @@ public class AuthorDaoTest {
     }
 
     @Test
-    void addingSevenAuthorsAndDeleteTwo() throws Exception {
+    void addingSevenAuthorsAndDeleteTwo() {
         AuthorDAO authorDAO = new AuthorDAOImpl();
 
         authorDAO.save(new Author("Первый"));
@@ -114,7 +114,7 @@ public class AuthorDaoTest {
     }
 
     @Test
-    void addingAndFindAuthor() throws Exception {
+    void addingAndFindAuthor() {
         AuthorDAO authorDAO = new AuthorDAOImpl();
 
         authorDAO.save(new Author("Первый"));
@@ -123,7 +123,7 @@ public class AuthorDaoTest {
     }
 
     @Test
-    void addingAndUpdateAuthor() throws Exception {
+    void addingAndUpdateAuthor() {
         AuthorDAO authorDAO = new AuthorDAOImpl();
 
         authorDAO.save(new Author("Первый"));
