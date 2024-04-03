@@ -7,7 +7,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.dao.AuthorDAO;
 import org.example.model.Author;
 import org.example.service.AuthorService;
 import org.example.service.AuthorServiceImpl;
@@ -28,6 +27,15 @@ public class AuthorServlet extends HttpServlet {
     private Converter<Author, AuthorDTO> toDtoConverter;
     private Converter<AuthorDTO, Author> toEntityConverter;
 
+    public AuthorServlet() {
+    }
+
+    public AuthorServlet(AuthorService authorService, Converter<Author, AuthorDTO> toDtoConverter, Converter<AuthorDTO, Author> toEntityConverter) {
+        this.authorService = authorService;
+        this.toDtoConverter = toDtoConverter;
+        this.toEntityConverter = toEntityConverter;
+    }
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -37,7 +45,7 @@ public class AuthorServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
 
@@ -67,7 +75,7 @@ public class AuthorServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Gson gson = new Gson();
         AuthorDTO authorDto;
         try {
@@ -110,7 +118,7 @@ public class AuthorServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Author ID is required");

@@ -26,6 +26,15 @@ public class GenreServlet extends HttpServlet {
     private Converter<Genre, GenreDTO> toDtoConverter;
     private Converter<GenreDTO, Genre> toEntityConverter;
 
+    public GenreServlet() {
+    }
+
+    public GenreServlet(GenreService genreService, Converter<Genre, GenreDTO> toDtoConverter, Converter<GenreDTO, Genre> toEntityConverter) {
+        this.genreService = genreService;
+        this.toDtoConverter = toDtoConverter;
+        this.toEntityConverter = toEntityConverter;
+    }
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -35,7 +44,7 @@ public class GenreServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         Gson gson = new Gson();
 
@@ -64,7 +73,7 @@ public class GenreServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Gson gson = new Gson();
         try {
             GenreDTO genreDto = gson.fromJson(request.getReader(), GenreDTO.class);
@@ -81,7 +90,7 @@ public class GenreServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Gson gson = new Gson();
         try {
             GenreDTO genreDto = gson.fromJson(request.getReader(), GenreDTO.class);
@@ -95,7 +104,7 @@ public class GenreServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Genre ID is required");

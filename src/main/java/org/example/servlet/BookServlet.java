@@ -28,6 +28,15 @@ public class BookServlet extends HttpServlet {
     private Converter<Book, BookDTO> toDtoConverter;
     private Converter<BookDTO, Book> toEntityConverter;
 
+    public BookServlet() {
+    }
+
+    public BookServlet(BookService bookService, Converter<Book, BookDTO> toDtoConverter, Converter<BookDTO, Book> toEntityConverter) {
+        this.bookService = bookService;
+        this.toDtoConverter = toDtoConverter;
+        this.toEntityConverter = toEntityConverter;
+    }
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -38,7 +47,7 @@ public class BookServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
         Gson gson = new Gson();
@@ -69,7 +78,7 @@ public class BookServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Gson gson = new Gson();
         try {
             BookDTO bookDto = gson.fromJson(request.getReader(), BookDTO.class);
@@ -86,7 +95,7 @@ public class BookServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Gson gson = new Gson();
         try {
             BookDTO bookDto = gson.fromJson(request.getReader(), BookDTO.class);
@@ -100,7 +109,7 @@ public class BookServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Book ID is required");
