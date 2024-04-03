@@ -9,10 +9,13 @@ public class AppConfig {
 
     public AppConfig() {
         try (InputStream inputStream = getClass().getResourceAsStream(PROP_FILE)) {
-
+            if (inputStream == null) {
+                throw new RuntimeException("Не найден файл конфигурации " + PROP_FILE + ".");
+            }
+            configProps.load(inputStream);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Не удалось загрузить файл конфигурации " + PROP_FILE + ".");
+            throw new RuntimeException("Не удалось загрузить файл конфигурации " + PROP_FILE + ".", e);
         }
     }
 

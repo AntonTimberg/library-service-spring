@@ -7,64 +7,59 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.model.Book;
-import org.example.service.BookService;
-import org.example.service.BookServiceImpl;
+import org.example.model.Genre;
 import org.example.service.GenreService;
 import org.example.service.GenreServiceImpl;
-import org.example.servlet.dto.BookDTO;
-import org.example.servlet.dto.converter.BookDtoToBookConverter;
-import org.example.servlet.dto.converter.BookToBookDtoConverter;
+import org.example.servlet.dto.GenreDTO;
 import org.example.servlet.dto.converter.Converter;
+import org.example.servlet.dto.converter.GenreDtoToGenreConverter;
+import org.example.servlet.dto.converter.GenreToGenreDtoConverter;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@WebServlet("/book/*")
-public class BookServlet extends HttpServlet {
+@WebServlet("/genre/*")
+public class GenreServlet extends HttpServlet {
 
-    private BookService bookService;
-    private Converter<Book, BookDTO> toDtoConverter;
-    private Converter<BookDTO, Book> toEntityConverter;
+    private GenreService genreService;
+    private Converter<Genre, GenreDTO> toDtoConverter;
+    private Converter<GenreDTO, Genre> toEntityConverter;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        this.bookService = new BookServiceImpl();
-        GenreService genreService = new GenreServiceImpl();
-        this.toDtoConverter = new BookToBookDtoConverter();
-        this.toEntityConverter = new BookDtoToBookConverter(genreService);
+        this.genreService = new GenreServiceImpl();
+        this.toDtoConverter = new GenreToGenreDtoConverter();
+        this.toEntityConverter = new GenreDtoToGenreConverter();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
         Gson gson = new Gson();
 
-        if (pathInfo != null && pathInfo.length() > 1) {
+        String idParam = request.getParameter("id");
+        if (idParam != null) {
             try {
-                int id = Integer.parseInt(pathInfo.substring(1));
-                Book book = bookService.findById(id).orElse(null);
-                if (book != null) {
-                    BookDTO bookDto = toDtoConverter.convert(book);
-                    String json = gson.toJson(bookDto);
-                    response.getWriter().write(json);
+                int id = Integer.parseInt(idParam);
+                Genre genre = genreService.findById(id).orElse(null);
+                if (genre != null) {
+                    GenreDTO genreDto = toDtoConverter.convert(genre);
+                    response.getWriter().write(gson.toJson(genreDto));
                 } else {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    response.getWriter().write("{\"message\":\"Book not found\"}");
+                    response.getWriter().write("{\"message\":\"Genre not found\"}");
                 }
             } catch (NumberFormatException e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write("{\"message\":\"Invalid book ID format\"}");
+                response.getWriter().write("{\"message\":\"Invalid genre ID format\"}");
             }
         } else {
-            List<BookDTO> booksDto = bookService.findAll().stream()
+            List<GenreDTO> genresDto = genreService.findAll().stream()
                     .map(toDtoConverter::convert)
                     .collect(Collectors.toList());
-            String json = gson.toJson(booksDto);
-            response.getWriter().write(json);
+            response.getWriter().write(gson.toJson(genresDto));
         }
     }
 
@@ -72,12 +67,12 @@ public class BookServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Gson gson = new Gson();
         try {
-            BookDTO bookDto = gson.fromJson(request.getReader(), BookDTO.class);
-            Book book = toEntityConverter.convert(bookDto);
-            bookService.save(book);
-            bookDto.setId(book.getId());
+            GenreDTO genreDto = gson.fromJson(request.getReader(), GenreDTO.class);
+            Genre genre = toEntityConverter.convert(genreDto);
+            genreService.save(genre);
+            genreDto.setId(genre.getId());
             response.setContentType("application/json");
-            response.getWriter().write(gson.toJson(bookDto));
+            response.getWriter().write(gson.toJson(genreDto));
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (JsonSyntaxException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -89,9 +84,9 @@ public class BookServlet extends HttpServlet {
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Gson gson = new Gson();
         try {
-            BookDTO bookDto = gson.fromJson(request.getReader(), BookDTO.class);
-            Book book = toEntityConverter.convert(bookDto);
-            bookService.update(book);
+            GenreDTO genreDto = gson.fromJson(request.getReader(), GenreDTO.class);
+            Genre genre = toEntityConverter.convert(genreDto);
+            genreService.update(genre);
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (JsonSyntaxException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -103,16 +98,16 @@ public class BookServlet extends HttpServlet {
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || pathInfo.equals("/")) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Book ID is required");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Genre ID is required");
             return;
         }
 
         try {
             int id = Integer.parseInt(pathInfo.substring(1));
-            bookService.delete(id);
+            genreService.delete(id);
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid book ID format");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid genre ID format");
         }
     }
 }
