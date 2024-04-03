@@ -8,7 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class AuthorServiceImpl implements AuthorService{
-    private final AuthorDAO authorDAO = new AuthorDAOImpl();
+    private final AuthorDAO authorDAO;
+
+    public AuthorServiceImpl() {
+        this.authorDAO = new AuthorDAOImpl();
+    }
+
+    public AuthorServiceImpl(AuthorDAO authorDAO) {
+        this.authorDAO = authorDAO;
+    }
 
     @Override
     public Optional<Author> findById(int id) {

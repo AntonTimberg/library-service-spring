@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.example.dao.AuthorDAO;
 import org.example.model.Author;
 import org.example.service.AuthorService;
 import org.example.service.AuthorServiceImpl;

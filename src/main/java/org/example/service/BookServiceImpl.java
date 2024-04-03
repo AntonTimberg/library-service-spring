@@ -8,7 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class BookServiceImpl implements BookService{
-    private final BookDAO bookDAO = new BookDAOImpl();
+    private final BookDAO bookDAO;
+
+    public BookServiceImpl() {
+        this.bookDAO = new BookDAOImpl();
+    }
+
+    public BookServiceImpl(BookDAO bookDAO) {
+        this.bookDAO = bookDAO;
+    }
 
     @Override
     public Optional<Book> findById(int id) {

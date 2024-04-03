@@ -8,7 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class GenreServiceImpl implements GenreService{
-    private final GenreDAO genreDAO = new GenreDAOImpl();
+    private final GenreDAO genreDAO;
+
+    public GenreServiceImpl() {
+        this.genreDAO = new GenreDAOImpl();
+    }
+
+    public GenreServiceImpl(GenreDAO genreDAO) {
+        this.genreDAO = genreDAO;
+    }
 
     @Override
     public Optional<Genre> findById(int id) {
@@ -22,13 +30,11 @@ public class GenreServiceImpl implements GenreService{
 
     @Override
     public void save(Genre genre) {
-//        validateGenre(genre);
         genreDAO.save(genre);
     }
 
     @Override
     public void update(Genre genre) {
-//        validateGenre(genre);
         genreDAO.update(genre);
     }
 
@@ -36,10 +42,4 @@ public class GenreServiceImpl implements GenreService{
     public void delete(int id) {
         genreDAO.delete(id);
     }
-
-//    private void validateGenre(Genre genre) {
-//        if (genre.getName() == null || genre.getName().trim().isEmpty()) {
-//            throw new IllegalArgumentException("Название жанра не может быть пустым");
-//        }
-//    }
 }
