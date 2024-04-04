@@ -82,11 +82,6 @@ public class BookServletTest {
     @Test
     void doPutUpdateBook() throws Exception {
         String jsonInput = "{\"id\":1, \"title\":\"Updated Book\", \"authorId\":1}";
-        BookDTO bookDtoInput = new BookDTO();
-        bookDtoInput.setId(1);
-        bookDtoInput.setTitle("Updated Book");
-        bookDtoInput.setAuthorId(1);
-
         Book updatedBook = new Book("Updated Book", 1);
 
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(jsonInput)));
