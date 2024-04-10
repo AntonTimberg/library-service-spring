@@ -1,3 +1,5 @@
+package serviceTests;
+
 import org.example.dao.AuthorDAO;
 import org.example.model.Author;
 import org.example.service.AuthorServiceImpl;

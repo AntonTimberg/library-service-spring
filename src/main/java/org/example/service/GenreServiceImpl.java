@@ -30,16 +30,24 @@ public class GenreServiceImpl implements GenreService{
 
     @Override
     public void save(Genre genre) {
+        validate(genre);
         genreDAO.save(genre);
     }
 
     @Override
     public void update(Genre genre) {
+        validate(genre);
         genreDAO.update(genre);
     }
 
     @Override
     public void delete(int id) {
         genreDAO.delete(id);
+    }
+
+    private void validate(Genre genre){
+        if (genre.getName() == null || genre.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Название жанра, не может быть пустым.");
+        }
     }
 }

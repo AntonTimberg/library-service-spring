@@ -1,3 +1,5 @@
+package serviceTests;
+
 import org.example.dao.BookDAO;
 import org.example.model.Book;
 import org.example.model.Genre;

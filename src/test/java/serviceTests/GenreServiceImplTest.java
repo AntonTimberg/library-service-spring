@@ -1,3 +1,5 @@
+package serviceTests;
+
 import org.example.dao.GenreDAO;
 import org.example.model.Genre;
 import org.example.service.GenreServiceImpl;
