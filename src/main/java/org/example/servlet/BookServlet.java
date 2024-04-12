@@ -78,13 +78,21 @@ public class BookServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Gson gson = new Gson();
         try {
             BookDTO bookDto = gson.fromJson(request.getReader(), BookDTO.class);
             Book book = toEntityConverter.convert(bookDto);
+
+            if (book == null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"message\":\"Invalid book data\"}");
+                return;
+            }
+
             bookService.save(book);
             bookDto.setId(book.getId());
+
             response.setContentType("application/json");
             response.getWriter().write(gson.toJson(bookDto));
             response.setStatus(HttpServletResponse.SC_CREATED);
