@@ -42,6 +42,26 @@ class AuthorServiceImplTest {
     }
 
     @Test
+    void updateValidAuthor() {
+        Author author = new Author("Обновлённый Автор");
+        author.setId(1);
+        doNothing().when(authorDAO).update(author);
+
+        authorService.update(author);
+
+        verify(authorDAO).update(author);
+    }
+
+    @Test
+    void updateInvalidAuthor() {
+        Author invalidAuthor = new Author("");
+        invalidAuthor.setId(1);
+
+        assertThrows(IllegalArgumentException.class, () -> authorService.update(invalidAuthor));
+        verify(authorDAO, never()).update(any(Author.class));
+    }
+
+    @Test
     void deleteAuthor() {
         doNothing().when(authorDAO).delete(1);
         authorService.delete(1);

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -69,6 +70,15 @@ class GenreServiceImplTest {
     }
 
     @Test
+    void saveGenreWithEmptyName() {
+        Genre genre = new Genre();
+        genre.setName("");
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> genreService.save(genre));
+        assertEquals("Название жанра, не может быть пустым.", exception.getMessage());
+    }
+
+    @Test
     void updateGenre() {
         Genre genre = new Genre();
         genre.setId(1);
@@ -78,5 +88,25 @@ class GenreServiceImplTest {
         genreService.update(genre);
 
         verify(genreDAO).update(genre);
+    }
+
+    @Test
+    void updateGenreWithNullName() {
+        Genre genre = new Genre();
+        genre.setId(1);
+        genre.setName(null);
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> genreService.update(genre));
+        assertEquals("Название жанра, не может быть пустым.", exception.getMessage());
+    }
+
+    @Test
+    void deleteGenre() {
+        int genreId = 1;
+        doNothing().when(genreDAO).delete(genreId);
+
+        genreService.delete(genreId);
+
+        verify(genreDAO).delete(genreId);
     }
 }
