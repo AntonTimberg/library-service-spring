@@ -78,6 +78,11 @@ public class GenreServlet extends HttpServlet {
         try {
             GenreDTO genreDto = gson.fromJson(request.getReader(), GenreDTO.class);
             Genre genre = toEntityConverter.convert(genreDto);
+            if (genre == null) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write("{\"message\":\"Invalid data\"}");
+                return;
+            }
             genreService.save(genre);
             genreDto.setId(genre.getId());
             response.setContentType("application/json");
