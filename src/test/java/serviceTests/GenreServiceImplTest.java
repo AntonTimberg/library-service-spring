@@ -17,7 +17,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class GenreServiceImplTest {
+class GenreServiceImplTest {
     private GenreDAO genreDAO;
     private GenreServiceImpl genreService;
 

@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class BookServletTest {
+class BookServletTest {
     private BookService bookService;
     private Converter<Book, BookDTO> toDtoConverter;
     private Converter<BookDTO, Book> toEntityConverter;

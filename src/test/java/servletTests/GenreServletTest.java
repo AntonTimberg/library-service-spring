@@ -25,7 +25,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class GenreServletTest {
+class GenreServletTest {
     private GenreService genreService;
     private Converter<Genre, GenreDTO> toDtoConverter;
     private Converter<GenreDTO, Genre> toEntityConverter;

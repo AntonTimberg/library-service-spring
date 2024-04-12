@@ -97,7 +97,7 @@ public class AuthorServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Gson gson = new Gson();
         try {
             AuthorDTO authorDto = gson.fromJson(request.getReader(), AuthorDTO.class);
