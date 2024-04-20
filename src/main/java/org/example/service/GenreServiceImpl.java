@@ -1,51 +1,95 @@
 package org.example.service;
 
-import org.example.dao.GenreDAO;
-import org.example.dao.GenreDAOImpl;
+import jakarta.inject.Named;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.example.model.Genre;
+import org.example.repository.GenreRepository;
+import org.example.controller.dto.GenreDTO;
+import org.example.controller.dto.mapper.GenreMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+@Service
 public class GenreServiceImpl implements GenreService{
-    private final GenreDAO genreDAO;
+    private final GenreMapper genreMapper;
+    private final GenreRepository genreRepo;
 
-    public GenreServiceImpl() {
-        this.genreDAO = new GenreDAOImpl();
-    }
-
-    public GenreServiceImpl(GenreDAO genreDAO) {
-        this.genreDAO = genreDAO;
-    }
-
-    @Override
-    public Optional<Genre> findById(int id) {
-        return genreDAO.findById(id);
+    @Autowired
+    public GenreServiceImpl(GenreMapper genreMapper, GenreRepository genreRepo) {
+        this.genreMapper = genreMapper;
+        this.genreRepo = genreRepo;
     }
 
     @Override
-    public List<Genre> findAll() {
-        return genreDAO.findAll();
+    public GenreDTO findById(Long id) {
+        return genreRepo.findById(id)
+                .map(genreMapper::convert)
+                .orElseThrow(() -> new EntityNotFoundException("Жанр с id " + id + " не найден."));
     }
 
     @Override
-    public void save(Genre genre) {
-        validate(genre);
-        genreDAO.save(genre);
+    public List<GenreDTO> findAll() {
+        List<Genre> genres = genreRepo.findAll();
+        return genres.stream().map(genreMapper::convert).collect(Collectors.toList());
     }
 
     @Override
-    public void update(Genre genre) {
-        validate(genre);
-        genreDAO.update(genre);
+    @Transactional
+    public GenreDTO save(Genre genre) {
+        validateGenre(genre);
+
+        boolean genreExists = genreRepo.findAll().stream()
+                .anyMatch(existingGenre -> existingGenre.getName().equalsIgnoreCase(genre.getName()));
+        if (genreExists) {
+            throw new IllegalArgumentException("Жанр с именем " + genre.getName() + " уже существует.");
+        }
+
+        return genreMapper.convert(genreRepo.save(genre));
     }
 
     @Override
-    public void delete(int id) {
-        genreDAO.delete(id);
+    @Transactional
+    public GenreDTO update(Genre genre) {
+        validateGenre(genre);
+
+        boolean genreExists = genreRepo.findAll().stream()
+                .anyMatch(existingGenre -> existingGenre.getName().equalsIgnoreCase(genre.getName()));
+        if (genreExists) {
+            throw new IllegalArgumentException("Жанр с именем " + genre.getName() + " уже существует.");
+        }
+
+        Genre existingGenre = genreRepo.findById(genre.getId()).get();
+        if (existingGenre == null) {
+            throw new EntityNotFoundException("Жанр с id=" + genre.getId() + " не найден");
+        }
+        existingGenre.setName(genre.getName());
+
+        return genreMapper.convert(genreRepo.save(existingGenre));
     }
 
-    private void validate(Genre genre){
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        Genre genre = genreRepo.findById(id).get();
+        if (genre != null) {
+            genreRepo.deleteById(id);
+        } else throw new EntityNotFoundException("Жанр с id " + id + " не найден.");
+    }
+
+    @Override
+    @Transactional
+    public Set<Genre> findAllByIds(List<Long> ids) {
+        return new HashSet<>(genreRepo.findAllById(ids));
+    }
+
+    private void validateGenre(Genre genre){
         if (genre.getName() == null || genre.getName().trim().isEmpty()) {
             throw new IllegalArgumentException("Название жанра, не может быть пустым.");
         }

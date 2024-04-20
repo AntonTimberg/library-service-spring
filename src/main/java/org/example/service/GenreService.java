@@ -1,14 +1,16 @@
 package org.example.service;
 
 import org.example.model.Genre;
+import org.example.controller.dto.GenreDTO;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 public interface GenreService {
-    Optional<Genre> findById(int id);
-    List<Genre> findAll();
-    void save(Genre genre);
-    void update(Genre genre);
-    void delete(int id);
+    GenreDTO findById(Long id);
+    List<GenreDTO> findAll();
+    Set<Genre> findAllByIds(List<Long> ids);
+    GenreDTO save(Genre genre);
+    GenreDTO update(Genre genre);
+    void delete(Long id);
 }
