@@ -21,10 +21,10 @@ public class BookServiceImpl implements BookService{
     private final AuthorRepository authorRepo;
 
     @Autowired
-    public BookServiceImpl(BookRepository bookRepo, BookMapper bookMapper, AuthorRepository authorRepo) {
+    public BookServiceImpl(BookRepository bookRepo, AuthorRepository authorRepo, BookMapper bookMapper) {
         this.bookRepo = bookRepo;
-        this.bookMapper = bookMapper;
         this.authorRepo = authorRepo;
+        this.bookMapper = bookMapper;
     }
 
     @Override

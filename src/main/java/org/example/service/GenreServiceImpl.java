@@ -1,6 +1,5 @@
 package org.example.service;
 
-import jakarta.inject.Named;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.example.model.Genre;
@@ -10,7 +9,6 @@ import org.example.controller.dto.mapper.GenreMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +20,7 @@ public class GenreServiceImpl implements GenreService{
     private final GenreRepository genreRepo;
 
     @Autowired
-    public GenreServiceImpl(GenreMapper genreMapper, GenreRepository genreRepo) {
+    public GenreServiceImpl(GenreRepository genreRepo, GenreMapper genreMapper) {
         this.genreMapper = genreMapper;
         this.genreRepo = genreRepo;
     }
