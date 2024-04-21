@@ -1,4 +1,4 @@
-package service;
+package serviceTests;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.example.controller.dto.AuthorDTO;
@@ -12,14 +12,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -38,12 +37,45 @@ class AuthorServiceImplTest {
 
     @Test
     void findAllTest(){
+        var author = new Author();
+        author.setName("Лев Толстой");
+        var authorDTO = new AuthorDTO();
+        authorDTO.setName("Лев Толстой");
+        List<Author> authors = List.of(author);
+        List<AuthorDTO> authorDTOS = List.of(authorDTO);
 
-    }
+        when(authorRepo.findAll()).thenReturn(authors);
+        when(authorMapper.convert(author)).thenReturn(authorDTO);
+
+        var actual = authorService.findAll();
+
+        assertEquals(authorDTOS, actual);
+
+        verify(authorRepo).findAll();
+        verify(authorMapper).convert(author);
+        verifyNoMoreInteractions(authorRepo, authorMapper);
+     }
 
     @Test
     void findByIdTest(){
+        var authorID = 1L;
+        var author = new Author();
+        author.setId(authorID);
+        author.setName("Лев Толстой");
+        var authorDTO = new AuthorDTO();
+        authorDTO.setId((int) authorID);
+        authorDTO.setName("Лев Толстой");
 
+        when(authorRepo.findById(authorID)).thenReturn(Optional.of(author));
+        when(authorMapper.convert(author)).thenReturn(authorDTO);
+
+        var actual = authorService.findById(authorID);
+
+        assertEquals(authorDTO, actual);
+
+        verify(authorRepo).findById(authorID);
+        verify(authorMapper).convert(author);
+        verifyNoMoreInteractions(authorRepo, authorMapper);
     }
 
     @Test
@@ -69,7 +101,27 @@ class AuthorServiceImplTest {
 
     @Test
     void updateAuthorTest(){
+        var authorID = 1L;
+        var author = new Author();
+        author.setId(authorID);
+        author.setName("Лев Толстой");
+        var authorDTO = new AuthorDTO();
+        authorDTO.setId((int) authorID);
+        authorDTO.setName("Лев Толстой");
 
+        when(authorRepo.existsById(author.getId())).thenReturn(true);
+        when(authorRepo.save(author)).thenReturn(author);
+        when(authorMapper.convert(author)).thenReturn(authorDTO);
+
+        AuthorDTO actual = authorService.update(author);
+
+        assertEquals(authorDTO, actual);
+
+        verify(authorRepo).existsById(author.getId());
+        verify(authorRepo).save(author);
+        verify(authorMapper).convert(author);
+
+        verifyNoMoreInteractions(authorRepo, authorMapper);
     }
 
     @Test
