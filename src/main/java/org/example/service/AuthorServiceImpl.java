@@ -58,10 +58,9 @@ public class AuthorServiceImpl implements AuthorService{
     @Override
     @Transactional
     public void delete(Long id) {
-        Author author = authorRepo.findById(id).get();
-        if (author != null) {
-            authorRepo.deleteById(id);
-        } else throw new EntityNotFoundException("Автор с id=" + author.getId() + " не найден");
+        Author author = authorRepo.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Автор с id=" + id + " не найден"));
+        authorRepo.deleteById(id);
     }
 
     private void validateAuthor(Author author) {
