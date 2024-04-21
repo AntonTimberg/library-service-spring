@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -79,6 +80,22 @@ class AuthorServiceImplTest {
     }
 
     @Test
+    void findByNotExistedIDTest(){
+        Long nonExistentId = 1L;
+
+        when(authorRepo.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
+            authorService.findById(nonExistentId);
+        });
+
+        assertEquals("Автор с id=" + nonExistentId + " не найден", exception.getMessage());
+
+        verify(authorRepo).findById(nonExistentId);
+        verifyNoMoreInteractions(authorRepo, authorMapper);
+    }
+
+    @Test
     void saveAuthorTest(){
         var author = new Author();
         author.setName("Лев Толстой");
@@ -97,6 +114,19 @@ class AuthorServiceImplTest {
         verify(authorMapper).convert(savedAuthor);
         verifyNoMoreInteractions(authorRepo);
         verifyNoMoreInteractions(authorMapper);
+    }
+
+    @Test
+    void saveAuthorWithoutNameTest(){
+        var author = new Author();
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            authorService.save(author);
+        });
+
+        assertEquals("Имя автора не может быть пустым", exception.getMessage());
+
+        verifyNoInteractions(authorRepo, authorMapper);
     }
 
     @Test

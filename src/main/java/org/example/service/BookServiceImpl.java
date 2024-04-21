@@ -47,6 +47,10 @@ public class BookServiceImpl implements BookService{
     public BookDTO save(Book book) {
         validateBook(book);
 
+        if (book.getAuthor() == null || book.getAuthor().getId() == null) {
+            throw new IllegalArgumentException("Книга должна иметь автора.");
+        }
+
         Author author = authorRepo.findById(book.getAuthor().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Автор книги с id=" + book.getAuthor().getId() + " не найден."));
 //        book.setAuthor(author);
@@ -69,19 +73,15 @@ public class BookServiceImpl implements BookService{
         existingBook.setAuthor(author);
         existingBook.setGenres(book.getGenres());
 
-
-
         return bookMapper.convert(bookRepo.save(existingBook));
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        Book book = bookRepo.findById(id).get();
-
-        if (book != null) {
-            bookRepo.deleteById(id);
-        } else throw new EntityNotFoundException("Книга с id=" + book.getId() + " не найдена");
+        Book book = bookRepo.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Книга с id=" + id + " не найдена"));
+        bookRepo.deleteById(id);
     }
 
     private void validateBook(Book book){
