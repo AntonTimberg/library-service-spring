@@ -75,10 +75,9 @@ public class GenreServiceImpl implements GenreService{
     @Override
     @Transactional
     public void delete(Long id) {
-        Genre genre = genreRepo.findById(id).get();
-        if (genre != null) {
-            genreRepo.deleteById(id);
-        } else throw new EntityNotFoundException("Жанр с id " + id + " не найден.");
+        Genre genre = genreRepo.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Жанр с id " + id + " не найден."));
+        genreRepo.deleteById(id);
     }
 
     @Override

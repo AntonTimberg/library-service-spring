@@ -37,7 +37,7 @@ class AuthorServiceImplTest {
     }
 
     @Test
-    void findAllTest(){
+    void findAllAuthorsTest(){
         var author = new Author();
         author.setName("Лев Толстой");
         var authorDTO = new AuthorDTO();
@@ -58,7 +58,7 @@ class AuthorServiceImplTest {
      }
 
     @Test
-    void findByIdTest(){
+    void findAuthorByIdTest(){
         var authorID = 1L;
         var author = new Author();
         author.setId(authorID);
@@ -80,7 +80,7 @@ class AuthorServiceImplTest {
     }
 
     @Test
-    void findByNotExistedIDTest(){
+    void findAuthorByNotExistedIDTest(){
         Long nonExistentId = 1L;
 
         when(authorRepo.findById(nonExistentId)).thenReturn(Optional.empty());
