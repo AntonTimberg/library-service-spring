@@ -24,6 +24,7 @@ public class AuthorServiceImpl implements AuthorService{
     }
 
     @Override
+    @Transactional
     public AuthorDTO findById(Long id) {
         return authorRepo.findById(id)
                 .map(authorMapper::convert)
@@ -31,6 +32,7 @@ public class AuthorServiceImpl implements AuthorService{
     }
 
     @Override
+    @Transactional
     public List<AuthorDTO> findAll() {
         List<Author> authors = authorRepo.findAll();
         return authors.stream().map(authorMapper::convert).collect(Collectors.toList());
