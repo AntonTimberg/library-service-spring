@@ -7,8 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AuthorMapperTest {
@@ -46,7 +44,6 @@ class AuthorMapperTest {
         AuthorDTO authorDTO = new AuthorDTO();
         authorDTO.setId(1);
         authorDTO.setName("Лев Толстой");
-        authorDTO.setBookIds(List.of(1));
 
         Author author = authorMapper.convert(authorDTO);
 
@@ -58,7 +55,6 @@ class AuthorMapperTest {
         AuthorDTO authorDTO = new AuthorDTO();
         authorDTO.setId(1);
         authorDTO.setName("Лев Толстой");
-        authorDTO.setBookIds(List.of(1));
 
         Author author = authorMapper.convert(authorDTO);
 
