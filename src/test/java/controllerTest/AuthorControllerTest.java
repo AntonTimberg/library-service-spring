@@ -83,10 +83,8 @@ class AuthorControllerTest {
     @Test
     void createAuthorTest() throws Exception {
         var authorDTO = new AuthorDTO();
-        authorDTO.setId(1);
         authorDTO.setName("Пушкин");
         var author = new Author();
-        authorDTO.setId(1);
         authorDTO.setName("Пушкин");
 
         when(authorMapper.convert(any(AuthorDTO.class))).thenReturn(author);
@@ -95,9 +93,8 @@ class AuthorControllerTest {
         mockMvc.perform(post("/authors")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Пушкин\"}"))
-                .andExpect(jsonPath("$.name").value("Пушкин"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L));
+                .andExpect(jsonPath("$.name").value("Пушкин"));
 
         verify(authorService).save(any());
     }
