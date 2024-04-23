@@ -30,15 +30,15 @@ public class RootConfig {
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(dataSource());
-        em.setPackagesToScan("org.example.model");
+        LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+        entityManagerFactoryBean.setDataSource(dataSource());
+        entityManagerFactoryBean.setPackagesToScan("org.example.model");
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        em.setJpaVendorAdapter(vendorAdapter);
-        em.getJpaPropertyMap().put("hibernate.show_sql", "true");
-        em.getJpaPropertyMap().put("hibernate.hbm2ddl.auto", "update");
-        em.getJpaPropertyMap().put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
-        return em;
+        entityManagerFactoryBean.setJpaVendorAdapter(vendorAdapter);
+        entityManagerFactoryBean.getJpaPropertyMap().put("hibernate.show_sql", "true");
+        entityManagerFactoryBean.getJpaPropertyMap().put("hibernate.hbm2ddl.auto", "update");
+        entityManagerFactoryBean.getJpaPropertyMap().put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+        return entityManagerFactoryBean;
     }
 
     @Bean
