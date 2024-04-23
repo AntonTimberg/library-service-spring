@@ -85,12 +85,17 @@ class AuthorControllerTest {
         var authorDTO = new AuthorDTO();
         authorDTO.setId(1);
         authorDTO.setName("Пушкин");
+        var author = new Author();
+        authorDTO.setId(1);
+        authorDTO.setName("Пушкин");
 
-        when(authorService.save(any())).thenReturn(authorDTO);
+        when(authorMapper.convert(any(AuthorDTO.class))).thenReturn(author);
+        when(authorService.save(any(Author.class))).thenReturn(authorDTO);
 
         mockMvc.perform(post("/authors")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Пушкин\"}"))
+                .andExpect(jsonPath("$.name").value("Пушкин"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
 
@@ -114,6 +119,7 @@ class AuthorControllerTest {
         mockMvc.perform(put("/authors/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Пушкин\"}"))
+                .andExpect(jsonPath("$.name").value("Пушкин"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Пушкин"));
 

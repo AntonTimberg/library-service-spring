@@ -98,6 +98,7 @@ class GenreControllerTest {
     void updateGenreTest() throws Exception{
         Long id = 1L;
         GenreDTO genreDTO = new GenreDTO(id, "Ужасы");
+
         when(genreMapper.convert(any(GenreDTO.class))).thenReturn(new Genre("Ужасы"));
         when(genreService.update(any(Genre.class))).thenReturn(genreDTO);
 
