@@ -2,10 +2,8 @@ package controllerTest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.controller.BookController;
-import org.example.controller.dto.AuthorDTO;
 import org.example.controller.dto.BookDTO;
 import org.example.controller.dto.mapper.BookMapper;
-import org.example.model.Author;
 import org.example.model.Book;
 import org.example.service.BookService;
 import org.example.service.GenreService;
