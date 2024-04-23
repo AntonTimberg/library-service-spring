@@ -119,7 +119,6 @@ class AuthorControllerTest {
         mockMvc.perform(put("/authors/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Пушкин\"}"))
-                .andExpect(jsonPath("$.name").value("Пушкин"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Пушкин"));
 
