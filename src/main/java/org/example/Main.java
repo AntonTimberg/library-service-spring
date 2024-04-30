@@ -8,7 +8,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 public class Main {
     public static void main(String[] args) {
-        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RootConfig.class)) {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
             AuthorService authorService = context.getBean(AuthorService.class);
             BookService bookService = context.getBean(BookService.class);
             GenreService genreService = context.getBean(GenreService.class);

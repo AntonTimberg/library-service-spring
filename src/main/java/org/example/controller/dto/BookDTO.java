@@ -48,14 +48,4 @@ public class BookDTO {
     public void setGenreIds(List<Long> genreIds) {
         this.genreIds = genreIds;
     }
-
-    @Override
-    public String toString() {
-        return "BookDTO{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", authorId=" + authorId +
-                ", genreIds=" + genreIds +
-                '}';
-    }
 }

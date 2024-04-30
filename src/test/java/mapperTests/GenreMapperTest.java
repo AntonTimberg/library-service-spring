@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class GenreMapperTest {
     private GenreMapper genreMapper;
@@ -18,46 +20,38 @@ class GenreMapperTest {
     }
 
     @Test
-    void genreToDtoNameTest(){
+    void genreToDtoConvertTest() {
         Genre genre = new Genre();
-        genre.setName("Жанр");
         genre.setId(1L);
+        genre.setName("Фэнтези");
 
-        var genreDto = genreMapper.convert(genre);
+        GenreDTO genreDto = genreMapper.convert(genre);
 
-        assertEquals(genre.getName(), genreDto.getName());
+        assertNotNull(genreDto);
+        assertEquals(genre.getId(), genreDto.getId(), "ID должен соответствовать");
+        assertEquals(genre.getName(), genreDto.getName(), "Название жанра должно соответствовать");
     }
 
     @Test
-    void dtoToGenreNameTest(){
-        var genreDTO = new GenreDTO();
+    void dtoToGeneConvertTest() {
+        GenreDTO genreDTO = new GenreDTO();
         genreDTO.setId(1L);
-        genreDTO.setName("Жанр");
+        genreDTO.setName("Фэнтези");
 
-        var genre = genreMapper.convert(genreDTO);
+        Genre genre = genreMapper.convert(genreDTO);
 
-        assertEquals(genre.getName(), genreDTO.getName());
+        assertNotNull(genre);
+        assertEquals(genreDTO.getId(), genre.getId(), "ID должен соответствовать");
+        assertEquals(genreDTO.getName(), genre.getName(), "Название жанра должно соответствовать");
     }
 
     @Test
-    void genreToDtoIdTest(){
-        Genre genre = new Genre();
-        genre.setName("Жанр");
-        genre.setId(1L);
-
-        var genreDto = genreMapper.convert(genre);
-
-        assertEquals(genre.getName(), genreDto.getName());
+    void nullGenreToDtoConvertTest() {
+        assertNull(genreMapper.convert((Genre) null), "Преобразование null жанра должно возвращать null");
     }
 
     @Test
-    void dtoToGenreIdTest(){
-        var genreDTO = new GenreDTO();
-        genreDTO.setId(1L);
-        genreDTO.setName("Жанр");
-
-        var genre = genreMapper.convert(genreDTO);
-
-        assertEquals(genre.getId(), genreDTO.getId());
+    void nullDtoToGenreConvertTest() {
+        assertNull(genreMapper.convert((GenreDTO) null), "Преобразование null DTO должно возвращать null");
     }
 }

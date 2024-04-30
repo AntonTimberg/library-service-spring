@@ -12,11 +12,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -90,6 +93,32 @@ class GenreServiceImplTest {
     }
 
     @Test
+    void saveGenreSuccessfullyTest() {
+        Genre genre = new Genre();
+        genre.setName("Фантастика");
+
+        GenreDTO expectedGenreDTO = new GenreDTO();
+        expectedGenreDTO.setId(1L);
+        expectedGenreDTO.setName("Фантастика");
+
+        when(genreRepo.findAll()).thenReturn(List.of());
+        when(genreRepo.save(any(Genre.class))).thenAnswer(a -> {
+            Genre savedGenre = a.getArgument(0);
+            savedGenre.setId(1L);
+            return savedGenre;
+        });
+        when(genreMapper.convert(any(Genre.class))).thenReturn(expectedGenreDTO);
+
+        GenreDTO resultGenreDTO = genreService.save(genre);
+
+        assertEquals(expectedGenreDTO, resultGenreDTO);
+        verify(genreRepo).findAll();
+        verify(genreRepo).save(genre);
+        verify(genreMapper).convert(genre);
+        verifyNoMoreInteractions(genreRepo, genreMapper);
+    }
+
+    @Test
     void saveGenreWithExistingNameTest() {
         Genre genre = new Genre();
         genre.setName("Фэнтези");
@@ -149,6 +178,49 @@ class GenreServiceImplTest {
     }
 
     @Test
+    void updateGenreNonExistentIdTest() {
+        Long nonExistentId = 1L;
+        Genre genreToUpdate = new Genre();
+        genreToUpdate.setId(nonExistentId);
+        genreToUpdate.setName("Драма");
+
+        when(genreRepo.findById(nonExistentId)).thenReturn(Optional.empty());
+
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> {
+            genreService.update(genreToUpdate);
+        });
+
+        assertEquals("Жанр с id=" + nonExistentId + " не найден", exception.getMessage());
+        verify(genreRepo).findById(nonExistentId);
+        verifyNoMoreInteractions(genreRepo, genreMapper);
+    }
+
+    @Test
+    void updateGenreWithExistingNameExceptionTest() {
+        Long genreId = 1L;
+        Genre existingGenre = new Genre();
+        existingGenre.setId(genreId);
+        existingGenre.setName("Драма");
+
+        Genre otherGenre = new Genre();
+        otherGenre.setId(genreId + 1);
+        otherGenre.setName("Драма");
+
+        when(genreRepo.findById(genreId)).thenReturn(Optional.of(existingGenre));
+        when(genreRepo.findAll()).thenReturn(List.of(existingGenre, otherGenre));
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            genreService.update(existingGenre);
+        });
+
+        assertEquals("Жанр с именем Драма уже существует.", exception.getMessage());
+        verify(genreRepo).findById(genreId);
+        verify(genreRepo).findAll();
+        verifyNoMoreInteractions(genreRepo, genreMapper);
+    }
+
+
+    @Test
     void deleteGenreWhenGenreIsNullTest() {
         Long genreId = 1L;
         when(genreRepo.findById(genreId)).thenReturn(Optional.empty());
@@ -175,6 +247,31 @@ class GenreServiceImplTest {
 
         verify(genreRepo).findById(genreId);
         verify(genreRepo).deleteById(genreId);
+        verifyNoMoreInteractions(genreRepo);
+    }
+
+    @Test
+    void findAllByIdsEmptyListTest() {
+        List<Long> emptyIds = Collections.emptyList();
+
+        Set<Genre> result = genreService.findAllByIds(emptyIds);
+
+        assertTrue(result.isEmpty());
+        verify(genreRepo).findAllById(emptyIds);
+        verifyNoMoreInteractions(genreRepo);
+    }
+
+    @Test
+    void findAllByIdsSomeNonExistentTest() {
+        List<Long> ids = List.of(1L, 2L, 999L);
+        List<Genre> foundGenres = List.of(new Genre());
+
+        when(genreRepo.findAllById(ids)).thenReturn(foundGenres);
+
+        Set<Genre> result = genreService.findAllByIds(ids);
+
+        assertEquals(1, result.size());
+        verify(genreRepo).findAllById(ids);
         verifyNoMoreInteractions(genreRepo);
     }
 }

@@ -59,16 +59,15 @@ public class GenreServiceImpl implements GenreService{
     public GenreDTO update(Genre genre) {
         validateGenre(genre);
 
+        Genre existingGenre = genreRepo.findById(genre.getId()).orElseThrow(() ->
+                new EntityNotFoundException("Жанр с id=" + genre.getId() + " не найден"));
+
         boolean genreExists = genreRepo.findAll().stream()
-                .anyMatch(existingGenre -> existingGenre.getName().equalsIgnoreCase(genre.getName()));
+                .anyMatch(g -> !g.getId().equals(genre.getId()) && g.getName().equalsIgnoreCase(genre.getName()));
         if (genreExists) {
             throw new IllegalArgumentException("Жанр с именем " + genre.getName() + " уже существует.");
         }
 
-        Genre existingGenre = genreRepo.findById(genre.getId()).get();
-        if (existingGenre == null) {
-            throw new EntityNotFoundException("Жанр с id=" + genre.getId() + " не найден");
-        }
         existingGenre.setName(genre.getName());
 
         return genreMapper.convert(genreRepo.save(existingGenre));

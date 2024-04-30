@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 class BookMapperTest {
@@ -190,5 +191,15 @@ class BookMapperTest {
 
         Book book = bookMapper.convert(bookDTO, genreService);
         assertEquals(2, book.getGenres().size());
+    }
+
+    @Test
+    void bookToDtoWithNullTest() {
+        assertNull(bookMapper.convert(null), "Конвертация null книги должна возвращать null");
+    }
+
+    @Test
+    void dtoToBookWithNullTest() {
+        assertNull(bookMapper.convert(null, genreService), "Конвертация null DTO должна возвращать null");
     }
 }
