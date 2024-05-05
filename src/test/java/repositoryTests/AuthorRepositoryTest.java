@@ -1,10 +1,9 @@
 package repositoryTests;
 
 import org.example.model.Author;
-import org.example.model.Book;
-import org.example.model.Genre;
 import org.example.repository.AuthorRepository;
 import org.example.repository.BookRepository;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -13,10 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
@@ -30,7 +31,7 @@ class AuthorRepositoryTest {
     private BookRepository bookRepository;
 
     @Test
-    public void testFindById() {
+    void saveAndFindByIdTest() {
         Author author = new Author();
         author.setName("Толстой");
 
@@ -43,7 +44,7 @@ class AuthorRepositoryTest {
     }
 
     @Test
-    public void testDeleteAuthor() {
+    void deleteAuthorTest() {
         Author author = new Author();
         author.setName("Толстой");
 
@@ -56,7 +57,7 @@ class AuthorRepositoryTest {
     }
 
     @Test
-    public void testUpdateAuthor() {
+    void updateAuthorTest() {
         Author author = new Author();
         author.setName("Толстой");
 
@@ -69,19 +70,18 @@ class AuthorRepositoryTest {
     }
 
     @Test
-    @Transactional
-    public void testCascadeDeleteBooks() {
+    void findAllAuthorsTest() {
         Author author = new Author();
-        author.setName("Толстой");
-        Book book = new Book();
-        book.setTitle("Война и мир");
-        book.setAuthor(author);
-        //book.setGenres();
-
+        Author author2 = new Author();
+        author.setName("Пушкин");
+        author2.setName("Толстой");
         authorRepository.save(author);
-        bookRepository.save(book);
-        authorRepository.delete(author);
+        authorRepository.save(author2);
 
-        assertTrue(bookRepository.findById(book.getId()).isEmpty());
+        List<String> genreNames = authorRepository.findAll().stream()
+                .map(Author::getName)
+                .collect(Collectors.toList());
+        List<String> expectedNames = Arrays.asList("Пушкин", "Толстой");
+        Assert.assertEquals(expectedNames, genreNames);
     }
 }

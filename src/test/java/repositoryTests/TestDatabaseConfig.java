@@ -20,15 +20,15 @@ import java.util.Properties;
 @Configuration
 @EnableJpaRepositories(basePackages = "org.example.repository")
 @EnableTransactionManagement
-public class TestDatabaseConfig {
-    public static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest");
+class TestDatabaseConfig {
+    static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:latest");
 
     static {
         postgreSQLContainer.start();
     }
 
     @Bean
-    public DataSource dataSource() {
+    DataSource dataSource() {
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setUrl(postgreSQLContainer.getJdbcUrl());
@@ -38,7 +38,7 @@ public class TestDatabaseConfig {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
+    LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource);
         em.setPackagesToScan("org.example.model");
@@ -55,7 +55,7 @@ public class TestDatabaseConfig {
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+    PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
         return new JpaTransactionManager(emf);
     }
 }
